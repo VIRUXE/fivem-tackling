@@ -1,9 +1,9 @@
 lib.callback.register('player:tryTackling', function(source, targetPlayerId)
-	local ableToTackle    = lib.callback.await('player:resistTackle', targetPlayerId, source)
-	local arePlayersClose = (#GetEntityCoords(GetPlayerPed(source)) - #GetEntityCoords(GetPlayerPed(targetPlayerId))) <= Config.MaximumDistance
-
-	-- Only allow to tackle if actually able to tackle and distance is still within spec
-	if ableToTackle and arePlayersClose then return true end
+	-- Check if they can resist first
+	if not lib.callback.await('player:resistTackle', targetPlayerId, source) then -- They weren't able to resist
+		-- Only allow tackling if still close
+		if (#GetEntityCoords(GetPlayerPed(source)) - #GetEntityCoords(GetPlayerPed(targetPlayerId))) <= Config.MaximumDistance then return true end
+	end
 	
 	return false
 end)
